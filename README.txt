@@ -1,0 +1,1 @@
+Instructions for deploying on Vercel: Drag and drop this folder.
