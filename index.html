@@ -1,1 +1,189 @@
-<!-- ShopCut App Main HTML -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>ShopCut — Bayless Ink</title>
+  <link rel="icon" href="./assets/tattoo-machine.svg" type="image/svg+xml"/>
+  <link rel="stylesheet" href="./style.css"/>
+  <meta name="description" content="ShopCut: simple, local-first shop cut calculator and ledger."/>
+</head>
+<body>
+  <div id="app" class="app">
+    <header class="topbar">
+      <div class="brand">
+        <img src="./assets/tattoo-machine.svg" alt="Tattoo machine icon" class="brand-icon"/>
+        <h1>ShopCut</h1>
+      </div>
+      <div class="actions">
+        <button id="btnPeople" class="btn">People</button>
+        <button id="btnTheme" class="btn">Theme</button>
+        <button id="btnWeekly" class="btn">Weekly</button>
+        <div class="export-group">
+          <button id="btnExportCSV" class="btn">Export CSV</button>
+          <label class="file-label">
+            Import CSV
+            <input type="file" id="inputImport" accept=".csv" />
+          </label>
+        </div>
+      </div>
+    </header>
+
+    <section class="entry-card card">
+      <h2>Add Entry</h2>
+      <form id="entryForm" class="entry-form">
+        <div class="field">
+          <label>Date</label>
+          <input type="date" id="entryDate" required />
+        </div>
+        <div class="field">
+          <label>Artist</label>
+          <select id="entryArtist" required></select>
+        </div>
+        <div class="field">
+          <label>Gross ($)</label>
+          <input type="number" id="entryGross" inputmode="decimal" min="0" step="0.01" placeholder="0.00" required />
+        </div>
+        <div class="field grow">
+          <label>Notes</label>
+          <input type="text" id="entryNotes" placeholder="optional"/>
+        </div>
+        <button class="btn primary" type="submit">Add</button>
+      </form>
+    </section>
+
+    <section class="filters card">
+      <h2>Filter & Totals</h2>
+      <div class="filters-row">
+        <div class="field">
+          <label>From</label>
+          <input type="date" id="filterFrom">
+        </div>
+        <div class="field">
+          <label>To</label>
+          <input type="date" id="filterTo">
+        </div>
+        <div class="field">
+          <label>Artist</label>
+          <select id="filterArtist">
+            <option value="">All</option>
+          </select>
+        </div>
+        <div class="field grow">
+          <label>Search Notes</label>
+          <input type="text" id="filterText" placeholder="search...">
+        </div>
+        <button id="btnClearFilters" class="btn">Clear</button>
+      </div>
+      <div id="totals" class="totals"></div>
+    </section>
+
+    <section class="ledger card">
+      <h2>Ledger</h2>
+      <div class="table-wrap">
+        <table id="ledgerTable">
+          <thead>
+            <tr>
+              <th>Date</th>
+              <th>Artist</th>
+              <th>Gross</th>
+              <th>% Mode</th>
+              <th>%</th>
+              <th>Shop Cut</th>
+              <th>Artist Take</th>
+              <th>Notes</th>
+              <th></th>
+            </tr>
+          </thead>
+          <tbody></tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- People Modal -->
+    <dialog id="peopleModal" class="modal">
+      <form method="dialog" class="modal-content card">
+        <header class="modal-header">
+          <h3>People</h3>
+          <button value="cancel" class="btn subtle">&times;</button>
+        </header>
+        <div id="peopleList" class="people-list"></div>
+        <div class="add-person-row">
+          <input type="text" id="newPersonName" placeholder="Name"/>
+          <input type="text" id="newPersonEmoji" placeholder="Emoji (optional)" maxlength="4"/>
+          <input type="number" id="newPersonPercent" placeholder="% (e.g., 60)" min="0" max="100" step="1"/>
+          <label class="toggle">
+            <input type="checkbox" id="newPersonPercentIsShop"/>
+            <span>Percent is <strong>Shop</strong></span>
+          </label>
+          <button id="btnAddPerson" class="btn">Add</button>
+        </div>
+        <p class="hint">
+          Toggle “Percent is Shop” if the saved % represents the <em>shop’s</em> share. If off, % is the artist’s share.
+        </p>
+      </form>
+    </dialog>
+
+    <!-- Theme Modal -->
+    <dialog id="themeModal" class="modal">
+      <form method="dialog" class="modal-content card">
+        <header class="modal-header">
+          <h3>Theme & Display</h3>
+          <button value="cancel" class="btn subtle">&times;</button>
+        </header>
+        <div class="theme-grid">
+          <label>Font
+            <select id="fontSelect">
+              <option value="system-ui">System</option>
+              <option value="Inter, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial">Inter</option>
+              <option value="Georgia, serif">Georgia</option>
+              <option value="Courier New, monospace">Courier New</option>
+            </select>
+          </label>
+          <label>Mode
+            <select id="modeSelect">
+              <option value="auto">Auto</option>
+              <option value="light">Light</option>
+              <option value="dark">Dark</option>
+            </select>
+          </label>
+          <label>Accent
+            <input type="color" id="accentColor" value="#8b5cf6"/>
+          </label>
+          <label>
+            Background Density
+            <input type="range" id="bgDensity" min="0" max="100" value="60"/>
+          </label>
+        </div>
+        <p class="hint">Background mimics a collage of purple tattoo stencils; tweak density to taste.</p>
+      </form>
+    </dialog>
+
+    <!-- Weekly Modal -->
+    <dialog id="weeklyModal" class="modal">
+      <form method="dialog" class="modal-content card">
+        <header class="modal-header">
+          <h3>Weekly Report</h3>
+          <button value="cancel" class="btn subtle">&times;</button>
+        </header>
+        <div class="weekly-controls">
+          <label>Week Starting
+            <input type="date" id="weekStart"/>
+          </label>
+          <button id="btnBuildWeekly" class="btn">Build</button>
+          <button id="btnMailWeekly" class="btn">Email</button>
+          <button id="btnCopyWeekly" class="btn">Copy</button>
+        </div>
+        <textarea id="weeklyText" rows="12" spellcheck="false"></textarea>
+        <p class="hint">“Email” opens your mail app with this summary. For automation/Sheets, see README.</p>
+      </form>
+    </dialog>
+
+    <footer class="footer">
+      <small>Local-first prototype. Data saved to your browser on this device. — ShopCut ©</small>
+    </footer>
+  </div>
+
+  <script src="./app.js"></script>
+</body>
+</html>
